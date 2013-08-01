@@ -1,5 +1,5 @@
 class Fixnum
-  def self.atoms 
+  @@atoms = 
     { 
       0 => "zero",
       1 => "one",
@@ -28,14 +28,28 @@ class Fixnum
       60 => "sixty",
       70 => "seventy",
       80 => "eighty",
-      90 => "ninety"
+      90 => "ninety",
+      100 => "one hundred",
+      200 => "two hundred",
+      300 => "three hundred",
+      400 => "four hundred",
+      500 => "five hundred",
+      600 => "six hundred",
+      700 => "seven hundred",
+      800 => "eight hundred",
+      900 => "nine hundred",
     }
-  end
 
-  def in_words(num)
-    return atoms[num] if atoms.include?(num)
+  def in_words
+    return @@atoms[self] if @@atoms.include?(self)
     words = ""
-    digits = num.to_s.scan(/./)
-    digits.reverse_each{|x|
-      words.insert(0, 'one') if 
+    digits = self.to_s.chars.map(&:to_i)
+    puts "the length of the array is " + digits.length.to_s
+    digits.reverse!
+    digits.each_with_index{|x,i|
+      words.insert(0, @@atoms[x*(10**i)].to_s + "#{" " if i!=0}")
+      puts "when i is " + i.to_s + ", the string is [" + "#{@@atoms[x*(10**i)].to_s}" + %Q(#{" " if i != 0}])
+    }
+    return words
+  end
 end
