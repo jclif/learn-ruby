@@ -28,18 +28,17 @@ $atoms =
     70 => "seventy",
     80 => "eighty",
     90 => "ninety",
-    100 => "one hundred"
   }
   
-$names = ["","thousand","million","billion"]
+$names = ["","thousand","million","billion","trillion"]
 
 def last_two(array,c)
   int = Integer(array.join)
-  return $atoms[int] if $atoms.include?(int)
-  words = ""
+  return [$atoms[int]] if $atoms.include?(int)
+  words = []
   array.reverse!
   array.each_with_index{|x,i|
-    words.insert(0, $atoms[x*(10**i)].to_s + "#{" " if i != 0 and c == 0}")
+    words.unshift $atoms[x*(10**i)].to_s
   }
   return words
 end
@@ -50,21 +49,23 @@ class Array
     if self.length >= 3
       if self[-3..-1] == Array.new(3,0)
         self.pop(3)
-        return ""
+        return []
       end
       popped = [self.pop, self.pop]
-      name = $atoms[self.pop] + " hundred"
+      name = [$atoms[self.pop],"hundred"]
       if popped != [0,0] 
         lt = last_two(popped.reverse,c)
-        return name + " " + lt + $names[c]
+        return name[0] != "zero" ? name + lt + [$names[c]] : lt + [$names[c]]
       else 
         return name
       end
     else
       if c == 0
-        return last_two([self.pop,self.pop].reverse,c)
+        lt = last_two([self.pop,self.pop].reverse,c)
+        return lt
       else 
-        return last_two([self.pop,self.pop].reverse,c) + " " + $names[c] + " "
+        lt = last_two([self.pop,self.pop].reverse,c) + [$names[c]]
+        return lt
       end
     end
   end
@@ -76,12 +77,30 @@ class Fixnum
     return $atoms[self] if $atoms.include?(self)
     digits = self.to_s.chars.map(&:to_i)
     counter = 0
-    words = ""
+    words = []
     while digits != []
-      words.insert(0,digits.take_three(counter))
+      words = digits.take_three(counter) + words
       counter = counter + 1
     end
-    return words
+    words.pop if words[-1] == ""
+    return words.join(" ")
+  end
+
+end
+
+class Bignum
+  
+  def in_words
+    return $atoms[self] if $atoms.include?(self)
+    digits = self.to_s.chars.map(&:to_i)
+    counter = 0
+    words = []
+    while digits != []
+      words = digits.take_three(counter) + words
+      counter = counter + 1
+    end
+    words.pop if words[-1] == ""
+    return words.join(" ")
   end
 
 end
